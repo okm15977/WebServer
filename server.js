@@ -15,8 +15,9 @@ var server =  http.createServer(function(req,res){//createServer 只有建立 �
     res.writeHead(200,resHeader);
     //writeHead是 寫 Headers
     //write 是 寫 Response
-    res.write('<h1>Hello</h1>','utf8');
-    res.write('<p>這是由node.js建立的 WebServer</p>','utf8');
+    res.write('<h1>Hello</h1>');
+    res.write('<p>這是由node.js建立的 WebServer</p>');
+    res.write('<p>已經成功連接到 Heroku 主機</p>');
     res.end();//沒寫end 可能資料只傳一半，end確保資料都送出去
 });
 
