@@ -1,26 +1,57 @@
-//引用 node.js 內建的 http 模組
-const http = require('http');
+// 載入 http 的模組
+var http = require('http');
+// 引用 File System 模組
+var fs = require('fs');
 
-var port = process.env.PORT || 1234;
+// 設定 port 預設為 1337，若系統環境有設定則以系統環境設定為主
+var port = process.env.PORT || 1337;
 
-//建立一個 HttpServer
-//req 從 client端發出來的
-//res 是由我們寫出去給 client
-var server =  http.createServer(function(req,res){//createServer 只有建立 沒有執行
-    var resHeader = {
-        'Accept-Charset': 'utf-8',
-        'Accept-Language': 'zh-TW',
-        'Content-Type':'text/html;charset = utf-8',
-    };
-    res.writeHead(200,resHeader);
-    //writeHead是 寫 Headers
-    //write 是 寫 Response
-    res.write('<h1>Hello</h1>');
-    res.write('<p>這是由node.js建立的 WebServer</p>');
-    res.write('<p>已經成功連接到 Heroku 主機</p>');
-    res.end();//沒寫end 可能資料只傳一半，end確保資料都送出去
+var url = require('url');
+var path = require('path');
+
+var file_content;
+
+var webPath = 'public';
+
+var server = http.createServer(function (req, res) {
+    // req 是 request 本地端請求的訊息
+    // res 是 response 主機回傳到本地端的訊息
+
+    // 解析使用者要求的路徑名稱
+    let url_path = url.parse(req.url);
+    console.log('path:'+url_path);
+    let pathname = url_path.pathname;
+    console.log('pathname:'+pathname);
+
+    // 判斷pathname是否為預設路徑
+    if (pathname === "/" || pathname === "/index.htm") {
+        pathname = 'index.html';
+    }
+
+    // __dirname 是程式的路徑
+    // webPath 是公開的資料夾
+    // pathname 是使用者要求的路徑名稱
+    var filePath = path.join(__dirname, webPath, pathname);  
+    console.log('filePath:'+filePath);
+
+    
+    // 讀取檔案
+    fs.readFile(filePath, 'utf8', function (err, content) {
+        if (err) {
+            console.log('Failed to read');
+            // 若檔案讀取錯誤，回傳 404
+            res.writeHead(404, { 'Content-Type': 'text/html;charset = utf-8' });
+            res.write("<h1>404. 找不到檔案!!</h1>");
+            res.end();  
+            return;
+        }
+        // 將檔案內容傳給瀏覽器
+        //res.writeHead(200, { 'Content-Type': 'text/' });
+        res.write(content);
+        res.end();
+    })
 });
 
-//將 Server開啟 port 1234 執行起來
-server.listen(port);//去網卡聽看看有沒有port= 1234的
-console.log("Server running at http://127.0.0.1:"+port);
+// 啟動並等待連接
+server.listen(port);
+console.log('Server running at http://127.0.0.1:' + port);
