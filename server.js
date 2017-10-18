@@ -33,7 +33,38 @@ var server = http.createServer(function (req, res) {
     // pathname 是使用者要求的路徑名稱
     var filePath = path.join(__dirname, webPath, pathname);  
     console.log('filePath:'+filePath);
+    
+    var resHeader = {
+        'Accept-Charset': 'utf-8',
+        'Accept-Language': 'zh-TW',
+        'Content-Type': 'text/html; charset=utf-8',
+    }
 
+    //特別判斷新資料的指令
+    //  /        /  為javascript 正規表示法的寫法
+    //^表示要找開頭為 /insert/\
+    if(/^\/insert\/[br]\d{8}\/.+\/.+/i.test(pathname)){
+        //解析 url 的資料
+        var list = pathname.split('/');
+        var action = list[1];
+        var sid =list[2];
+        var name =list[3];
+        var dep = list[4];
+
+        console.log(pathname);
+
+        //將資料讀取，並且新增到 MongoDB
+
+        //顯示新增後的結果
+
+        res.writeHead(200,resHeader);
+        res.write("<h1>新增資料</h1>");
+        res.write("學號:"+sid+"<br>");
+        res.write("姓名:"+name+"<br>");
+        res.write("科系:"+dep+"<br>");
+        res.write(pathname);
+        res.end();
+    }
     
     // 讀取檔案
     fs.readFile(filePath, 'utf8', function (err, content) {
